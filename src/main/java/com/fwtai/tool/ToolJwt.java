@@ -46,6 +46,10 @@ public final class ToolJwt{
         return claimsResolver.apply(claims);
     }
 
+    public final static Claims parserToken(final String token){
+        return extractAllClaims(token);
+    }
+
     private final static Claims extractAllClaims(final String token){
         final Key key = Keys.hmacShaKeyFor(secret.getBytes());
         final JwtParserBuilder builder = Jwts.parserBuilder();
@@ -63,19 +67,30 @@ public final class ToolJwt{
         return createToken(userName,claims);
     }
 
+    // setSubject 不能和s etClaims() 同时使用,如果用不到 userId() 的话可以把setId的值设为 userName !!!
     private final static String createToken(final String userName,final Map<String,Object> claims){
         final long date = System.currentTimeMillis();
         final Key key = Keys.hmacShaKeyFor(secret.getBytes());
         final JwtBuilder builder = Jwts.builder().signWith(key,SignatureAlgorithm.HS384);
-        builder.setSubject(userName).setClaims(claims).setIssuer(issuer).setIssuedAt(new Date(date)).setExpiration(new Date(date + expiry));
-        return builder.compact();
+        if(claims != null && claims.size() > 0){
+            for(final String k : claims.keySet()){
+                builder.claim(k,claims.get(k));
+            }
+        }
+        return builder.setSubject(userName).setIssuer(issuer).setIssuedAt(new Date(date)).setExpiration(new Date(date + expiry)).compact();
     }
 
+    // setSubject 不能和s etClaims() 同时使用,如果用不到 userId() 的话可以把setId的值设为 userName !!!
     private final static String createToken(final String id,final String subject,final Map<String,Object> claims){
         final long date = System.currentTimeMillis();
         final Key key = Keys.hmacShaKeyFor(secret.getBytes());
         final JwtBuilder builder = Jwts.builder().signWith(key,SignatureAlgorithm.HS384);
-        builder.setId(id).setClaims(claims).setIssuer(issuer).setIssuedAt(new Date(date)).setExpiration(new Date(date + expiry)).setSubject(subject);
+        if(claims != null && claims.size() > 0){
+            for(final String k : claims.keySet()){
+                builder.claim(k,claims.get(k));
+            }
+        }
+        builder.setId(id).setIssuer(issuer).setIssuedAt(new Date(date)).setExpiration(new Date(date + expiry)).setSubject(subject);
         return builder.compact();
     }
 

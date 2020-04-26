@@ -1,10 +1,9 @@
 package com.fwtai.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fwtai.constants.SecurityConstants;
 import com.fwtai.model.LoginDto;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
+import com.fwtai.tool.ToolClient;
+import com.fwtai.tool.ToolJwt;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,8 +19,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Key;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +37,7 @@ public class JwtAuthenticateFilter extends UsernamePasswordAuthenticationFilter{
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,HttpServletResponse response) throws AuthenticationException{
         final LoginDto loginDto = new LoginDto(request.getParameter("username"),request.getParameter("password"));
-        UsernamePasswordAuthenticationToken uToken = new UsernamePasswordAuthenticationToken(loginDto.getUsername(),loginDto.getPassword());
+        final UsernamePasswordAuthenticationToken uToken = new UsernamePasswordAuthenticationToken(loginDto.getUsername(),loginDto.getPassword());
         return this.authenticationManager.authenticate(uToken);
     }
 
@@ -48,19 +45,13 @@ public class JwtAuthenticateFilter extends UsernamePasswordAuthenticationFilter{
     protected void successfulAuthentication(HttpServletRequest request,HttpServletResponse response,FilterChain chain,Authentication authResult) throws IOException, ServletException{
         final User user = (User) authResult.getPrincipal();
         final List<String> roles = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
-        final Key key = Keys.hmacShaKeyFor(SecurityConstants.JWT_SECRET.getBytes());
-        final String token = Jwts.builder().setHeaderParam("TYP",SecurityConstants.TOKEN_TYPE).setIssuer(SecurityConstants.TOKEN_ISSUER).setAudience(SecurityConstants.TOKEN_AUDIENCE).setExpiration(new Date(System.currentTimeMillis() + 60000)).setSubject(user.getUsername()).setIssuedAt(new Date()).setSubject(user.getUsername()).claim("rol",roles).signWith(key).compact();
+        final String token = ToolJwt.generateToken(user.getUsername(),roles);
         response.setHeader(SecurityConstants.TOKEN_HEADER,SecurityConstants.TOKEN_PREFIX + token);
-    }
-
-    private LoginDto pareData(HttpServletRequest request) throws IOException{
-        final ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readValue(request.getInputStream(),LoginDto.class);
+        ToolClient.responseJson(ToolClient.createJsonSuccess(token),response);
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request,HttpServletResponse response,AuthenticationException failed) throws IOException, ServletException{
-        System.out.println("用户名或密码错误");
-        super.unsuccessfulAuthentication(request,response,failed);
+    protected void unsuccessfulAuthentication(final HttpServletRequest request,final HttpServletResponse response,final AuthenticationException failed) throws IOException, ServletException{
+        ToolClient.responseJson(ToolClient.createJsonFail("用户名或密码错误"),response);
     }
 }
