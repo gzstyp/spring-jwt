@@ -4,7 +4,6 @@ import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -21,7 +20,6 @@ import java.util.Collection;
 import java.util.List;
 
 //权限(角色)拦截器
-@Log4j2
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 
     public JwtAuthorizationFilter(final AuthenticationManager authenticationManager){
@@ -45,7 +43,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
                 final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,null,null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }catch(final Exception exception){
-                log.warn("Request to parse JWT failed : {}",exception.getMessage());
+                System.err.println(exception.getMessage());
                 if(exception instanceof ExpiredJwtException){
                     ToolClient.responseJson(ToolClient.createJsonFail("token已过期"),response);
                     return;
