@@ -13,6 +13,11 @@ public final class ConfigFile{
 
     public final static String roles = "roles";
 
-    public final static String authorization = "Authorization";
+    public static final String AUTH_LOGIN_URL = "/api/token";
+    public static final String TOKEN_HEADER = "Authorization";
+    public static final String TOKEN_PREFIX = "Bearer ";
 
+    private ConfigFile() {
+        throw new IllegalStateException("不能创建静态的类示例");
+    }
 }

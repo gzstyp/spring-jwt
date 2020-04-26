@@ -1,6 +1,5 @@
 package com.fwtai.config;
 
-import com.fwtai.constants.SecurityConstants;
 import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJwt;
 import io.jsonwebtoken.Claims;
@@ -18,6 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 //权限(角色)拦截器
@@ -29,22 +29,19 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
     }
 
     @Override
-    protected void doFilterInternal(final HttpServletRequest request,final HttpServletResponse response,FilterChain filterChain) throws IOException, ServletException{
-        final String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
-        if(!StringUtils.isEmpty(token) && token.startsWith(SecurityConstants.TOKEN_PREFIX)){
+    protected void doFilterInternal(final HttpServletRequest request,final HttpServletResponse response,final FilterChain filterChain) throws IOException, ServletException{
+        final String token = request.getHeader(ConfigFile.TOKEN_HEADER);
+        if(!StringUtils.isEmpty(token) && token.startsWith(ConfigFile.TOKEN_PREFIX)){
             try{
                 final Claims claims = ToolJwt.parserToken(token.substring(7));
-                //final String username = ToolJwt.extractClaim(token,Claims::getSubject);
                 final String username = claims.getSubject();
-                final List<GrantedAuthority> authorities = claims.get(ConfigFile.roles,List.class);
-                //final Jws<Claims> claimsJws = Jwts.parserBuilder().setSigningKey(SecurityConstants.JWT_SECRET.getBytes()).build().parseClaimsJws(token.replace(SecurityConstants.TOKEN_PREFIX,""));
-                // = claimsJws.getBody().getSubject();
-                //final List authorities = ((List<?>) claimsJws.getBody().get("rol")).stream().map(authority -> new SimpleGrantedAuthority((String) authority)).collect(Collectors.toList());
+                final Collection<GrantedAuthority> authorities = claims.get(ConfigFile.roles,List.class);
                 if(username == null){
                     ToolClient.responseJson(ToolClient.createJsonFail("无效的token"),response);
                     return;
                 }
-                final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,null,authorities);
+                // 第2个参数是数据库加密的密码(如果报错可能是不需要加密的密码),但是这个密码是如何实现动态呢???可以使用LocalThread的存值取值???
+                final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,"$2a$10$0DyIbDAjgBjatDoBYLyXW.0L7LwU7mxAs9rAZjQFSu0bPKz2mbxFe",null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }catch(final Exception exception){
                 log.warn("Request to parse JWT failed : {}",exception.getMessage());

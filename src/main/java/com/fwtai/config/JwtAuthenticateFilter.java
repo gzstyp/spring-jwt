@@ -1,10 +1,8 @@
 package com.fwtai.config;
 
-import com.fwtai.constants.SecurityConstants;
 import com.fwtai.model.LoginDto;
 import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJwt;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,10 +28,9 @@ public class JwtAuthenticateFilter extends UsernamePasswordAuthenticationFilter{
 
     public JwtAuthenticateFilter(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
-        setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);//默认是 super(new AntPathRequestMatcher("/login", "POST"));
+        setFilterProcessesUrl(ConfigFile.AUTH_LOGIN_URL);//默认是 super(new AntPathRequestMatcher("/login", "POST"));
     }
 
-    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,HttpServletResponse response) throws AuthenticationException{
         final LoginDto loginDto = new LoginDto(request.getParameter("username"),request.getParameter("password"));
@@ -46,7 +43,7 @@ public class JwtAuthenticateFilter extends UsernamePasswordAuthenticationFilter{
         final User user = (User) authResult.getPrincipal();
         final List<String> roles = user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         final String token = ToolJwt.generateToken(user.getUsername(),roles);
-        response.setHeader(SecurityConstants.TOKEN_HEADER,SecurityConstants.TOKEN_PREFIX + token);
+        response.setHeader(ConfigFile.TOKEN_HEADER,ConfigFile.TOKEN_PREFIX + token);
         ToolClient.responseJson(ToolClient.createJsonSuccess(token),response);
     }
 

@@ -1,5 +1,7 @@
 package com.fwtai.config;
 
+import com.fwtai.respository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private UserRepository userRepository;//有值,可以在configure(final AuthenticationManagerBuilder auth)实现登录认证
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -27,8 +32,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
+    /*
+    //这里也可以实现登录认证的(多种认证方式之一)
+    @Override
+    protected void configure(final AuthenticationManagerBuilder auth) throws Exception{
+
+    }*/
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+
 }
