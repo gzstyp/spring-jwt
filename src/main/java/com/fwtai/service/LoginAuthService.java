@@ -20,6 +20,7 @@ public class LoginAuthService implements UserDetailsService{
     @Autowired
     private UserRepository userRepository;
 
+    //查看 UserDetailsService、UserDetails 的源码收获更多
     @Override
     public UserDetails loadUserByUsername(final String username){
         final User user = userRepository.findByName(username).orElseThrow(() -> new UsernameNotFoundException("user not exit"));
