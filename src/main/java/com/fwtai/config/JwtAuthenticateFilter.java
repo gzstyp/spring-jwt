@@ -30,7 +30,7 @@ public class JwtAuthenticateFilter extends UsernamePasswordAuthenticationFilter{
 
     public JwtAuthenticateFilter(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
-        setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);
+        setFilterProcessesUrl(SecurityConstants.AUTH_LOGIN_URL);//默认是 super(new AntPathRequestMatcher("/login", "POST"));
     }
 
     @SneakyThrows
