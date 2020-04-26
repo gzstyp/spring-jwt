@@ -40,8 +40,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
                     ToolClient.responseJson(ToolClient.createJsonFail("无效的token"),response);
                     return;
                 }
-                // 第2个参数是数据库加密的密码(如果报错可能是不需要加密的密码),但是这个密码是如何实现动态呢???可以使用LocalThread的存值取值???
-                final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,"$2a$10$0DyIbDAjgBjatDoBYLyXW.0L7LwU7mxAs9rAZjQFSu0bPKz2mbxFe",null);
+                // 第2个参数是数据库加密的密码(如果报错可能是不需要加密的密码),但是这个密码是如何实现动态呢???可以使用看看项目(F:\IntellijProjects\web\shiro_jwt\ssjwt)的设计方式
+                //final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,"$2a$10$0DyIbDAjgBjatDoBYLyXW.0L7LwU7mxAs9rAZjQFSu0bPKz2mbxFe",null);
+                final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,null,null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }catch(final Exception exception){
                 log.warn("Request to parse JWT failed : {}",exception.getMessage());
