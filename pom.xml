@@ -13,7 +13,7 @@
     <version>v1.0.0</version>
     <name>spring-jwt</name>
     <description>
-        基于spring security + jwt 构建项目
+        基于spring boot 2 + spring security + jwt 构建项目,实现动态配置url权限
     </description>
 
     <properties>
