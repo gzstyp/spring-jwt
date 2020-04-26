@@ -1,8 +1,8 @@
-package com.example.springjwt.config;
+package com.fwtai.config;
 
-import com.example.springjwt.constants.SecurityConstants;
-import com.example.springjwt.model.LoginDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fwtai.constants.SecurityConstants;
+import com.fwtai.model.LoginDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.SneakyThrows;

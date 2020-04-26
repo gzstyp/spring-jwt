@@ -1,13 +1,11 @@
-package com.example.springjwt.config;
+package com.fwtai.config;
 
-import com.example.springjwt.constants.SecurityConstants;
+import com.fwtai.constants.SecurityConstants;
+import com.fwtai.tool.ToolClient;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,22 +26,12 @@ import java.util.stream.Collectors;
 @Log4j2
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager){
+    public JwtAuthorizationFilter(final AuthenticationManager authenticationManager){
         super(authenticationManager);
     }
 
     @Override
     protected void doFilterInternal(final HttpServletRequest request,final HttpServletResponse response,FilterChain filterChain) throws IOException, ServletException{
-        final UsernamePasswordAuthenticationToken authentication = getAuthentication(request,response);
-        if(authentication == null){
-            filterChain.doFilter(request,response);
-            return;
-        }
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        filterChain.doFilter(request,response);
-    }
-
-    private UsernamePasswordAuthenticationToken getAuthentication(final HttpServletRequest request,final HttpServletResponse response){
         final String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
         if(!StringUtils.isEmpty(token) && token.startsWith(SecurityConstants.TOKEN_PREFIX)){
             try{
@@ -51,20 +39,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
                 final String username = claimsJws.getBody().getSubject();
                 final List authorities = ((List<?>) claimsJws.getBody().get("rol")).stream().map(authority -> new SimpleGrantedAuthority((String) authority)).collect(Collectors.toList());
                 if(!StringUtils.isEmpty(username)){
-                    return new UsernamePasswordAuthenticationToken(username,null,authorities);
+                    final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,null,authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-            }catch(ExpiredJwtException exception){
-                log.warn("Request to parse expired JWT : {} failed : {}",token,exception.getMessage());
-            }catch(UnsupportedJwtException exception){
-                log.warn("Request to parse unsupported JWT : {} failed : {}",token,exception.getMessage());
-            }catch(MalformedJwtException exception){
-                log.warn("Request to parse invalid JWT : {} failed : {}",token,exception.getMessage());
-            }catch(SignatureException exception){
-                log.warn("Request to parse JWT with invalid signature : {} failed : {}",token,exception.getMessage());
-            }catch(IllegalArgumentException exception){
-                log.warn("Request to parse empty or null JWT : {} failed : {}",token,exception.getMessage());
+            }catch(final Exception exception){
+                log.warn("Request to parse JWT failed : {}",exception.getMessage());
+                if(exception instanceof ExpiredJwtException){
+                    ToolClient.responseJson(ToolClient.createJsonFail("token已过期"),response);
+                    return;
+                }else{
+                    ToolClient.responseJson(ToolClient.createJsonFail("登录信息已过期,请重新登录"),response);
+                    return;
+                }
             }
         }
-        return null;
+        filterChain.doFilter(request,response);
     }
 }

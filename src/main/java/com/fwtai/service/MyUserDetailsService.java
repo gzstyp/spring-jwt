@@ -1,7 +1,7 @@
-package com.example.springjwt.service;
+package com.fwtai.service;
 
-import com.example.springjwt.entity.User;
-import com.example.springjwt.respository.UserRepository;
+import com.fwtai.entity.User;
+import com.fwtai.respository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

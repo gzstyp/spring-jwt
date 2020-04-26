@@ -1,4 +1,4 @@
-package com.example.springjwt.constants;
+package com.fwtai.constants;
 
 public final class SecurityConstants {
 

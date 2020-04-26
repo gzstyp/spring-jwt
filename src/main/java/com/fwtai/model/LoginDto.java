@@ -1,4 +1,4 @@
-package com.example.springjwt.model;
+package com.fwtai.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

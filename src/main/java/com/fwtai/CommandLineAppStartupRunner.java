@@ -1,8 +1,8 @@
-package com.example.springjwt;
+package com.fwtai;
 
-import com.example.springjwt.entity.Role;
-import com.example.springjwt.entity.User;
-import com.example.springjwt.respository.UserRepository;
+import com.fwtai.entity.Role;
+import com.fwtai.entity.User;
+import com.fwtai.respository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;

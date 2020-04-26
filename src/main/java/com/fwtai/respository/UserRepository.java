@@ -1,6 +1,6 @@
-package com.example.springjwt.respository;
+package com.fwtai.respository;
 
-import com.example.springjwt.entity.User;
+import com.fwtai.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
