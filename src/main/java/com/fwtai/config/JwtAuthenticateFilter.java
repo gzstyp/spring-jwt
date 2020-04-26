@@ -31,6 +31,7 @@ public class JwtAuthenticateFilter extends UsernamePasswordAuthenticationFilter{
         setFilterProcessesUrl(ConfigFile.AUTH_LOGIN_URL);//默认是 super(new AntPathRequestMatcher("/login", "POST"));
     }
 
+    //Attempt 试图；尝试
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,HttpServletResponse response) throws AuthenticationException{
         final LoginDto loginDto = new LoginDto(request.getParameter("username"),request.getParameter("password"));
