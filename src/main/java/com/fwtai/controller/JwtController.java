@@ -13,6 +13,7 @@ public class JwtController {
     }
 
     @GetMapping("/api/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     public String admin(){
         return "This is an admin api msg";
     }
