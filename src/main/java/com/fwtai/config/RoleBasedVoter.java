@@ -13,8 +13,9 @@ import java.util.Collection;
 */
 public class RoleBasedVoter implements AccessDecisionVoter<Object>{
 
+    //将两个supports()都设置成true
     @Override
-    public boolean supports(ConfigAttribute attribute){
+    public boolean supports(final ConfigAttribute attribute){
         return true;
     }
 
@@ -42,6 +43,7 @@ public class RoleBasedVoter implements AccessDecisionVoter<Object>{
         final FilterInvocation fi = (FilterInvocation) object;
         final String userName = (String)authentication.getPrincipal();
         final String url = fi.getRequestUrl();//url就是请求的url 这里扩展空间就大了，可以从DB动态加载，然后判断URL的ConfigAttribute就可以了。
+        String httpMethod = fi.getRequest().getMethod();
         return result;
     }
 
@@ -49,6 +51,7 @@ public class RoleBasedVoter implements AccessDecisionVoter<Object>{
         return authentication.getAuthorities();
     }
 
+    //将两个supports()都设置成true
     @Override
     public boolean supports(final Class cls){
         return true;

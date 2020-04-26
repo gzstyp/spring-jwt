@@ -4,7 +4,12 @@ import com.fwtai.tool.ToolClient;
 import com.fwtai.tool.ToolJwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,6 +51,21 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter{
                 System.err.println(exception.getMessage());
                 if(exception instanceof ExpiredJwtException){
                     ToolClient.responseJson(ToolClient.createJsonFail("token已过期"),response);
+                    return;
+                }else if (exception instanceof LockedException) {
+                    ToolClient.responseJson(ToolClient.createJsonFail("账户被锁定,登陆失败"),response);
+                    return;
+                } else if (exception instanceof BadCredentialsException) {
+                    ToolClient.responseJson(ToolClient.createJsonFail("账户或者密码错误,登陆失败"),response);
+                    return;
+                } else if (exception instanceof DisabledException) {
+                    ToolClient.responseJson(ToolClient.createJsonFail("账户被禁用,登陆失败"),response);
+                    return;
+                } else if (exception instanceof AccountExpiredException) {
+                    ToolClient.responseJson(ToolClient.createJsonFail("账户已过期,登陆失败"),response);
+                    return;
+                } else if (exception instanceof CredentialsExpiredException) {
+                    ToolClient.responseJson(ToolClient.createJsonFail("密码已过期,登陆失败"),response);
                     return;
                 }else{
                     ToolClient.responseJson(ToolClient.createJsonFail("登录信息已过期,请重新登录"),response);
